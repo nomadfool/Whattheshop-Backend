@@ -30,5 +30,8 @@ class ItemListSerializer(serializers.ModelSerializer):
         fields =  ['id', 'name','price','image', 'quantity', 'category' ]
 
         
-
-    
+class ItemdetailSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(many = True)
+    class Meta:
+        model = Item
+        fields =  '__all__'
