@@ -20,4 +20,18 @@ class Item(models.Model):
     def __str__(self):
         return self.name
 
+class Cart(models.Model):
+    item = models.ManyToManyField(Item)
+    user = models.ForeignKey(User , on_delete = models.CASCADE, null = True )
+    status = models.BooleanField(default = 'NotCheck')
+
+
+
+
+class ThroughCartItemModel(models.Model):
+    item = models.ForeignKey(Item, on_delete = models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete = models.CASCADE)
+    quantity = models.PositiveIntegerField()    
+
+
 
