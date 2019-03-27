@@ -6,5 +6,5 @@ urlpatterns = [
     path('login/', obtain_jwt_token, name='login'),
     path('register/', UserCreateAPIView.as_view(), name='register'),
     path('list/', ItemListAPIView.as_view(), name = 'list'),
-    path('detail/<int:item_id>/', ItemDetailAPIView.as_view(), name = 'detail')
+    # path('detail/<int:item_id>/', ItemDetailAPIView.as_view(), name = 'detail')
 ]
