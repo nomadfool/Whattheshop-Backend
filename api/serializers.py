@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Item ,Category
+from .models import Item ,Category ,ThroughCartItemModel , Cart
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -30,6 +30,25 @@ class ItemListSerializer(serializers.ModelSerializer):
         model = Item
         fields =  '__all__'
 
+class CreateModelThrough(serializers.ModelSerializer):
+    cart = serializers.SerializerMethodField()
+    class Meta:
+        model = ThroughCartItemModel
+        fields = ['id', 'item','quantity','cart'] 
+        read_only_fields = ['cart']
+
+    def get_cart(self, obj):
+        return obj.cart.id
+
+
+
+
+
+class CheckOutSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Cart
+        fields = ['status']       
         
 # class ItemdetailSerializer(serializers.ModelSerializer):
 #     category = CategorySerializer(many = True)
