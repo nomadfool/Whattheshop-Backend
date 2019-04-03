@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from phone_field import PhoneField
 
 class Category(models.Model):
     name = models.CharField(max_length = 240)
@@ -41,7 +42,37 @@ class Cart(models.Model):
 class ThroughCartItemModel(models.Model):
     item = models.ForeignKey(Item, on_delete = models.CASCADE, related_name = 'through')
     cart = models.ForeignKey(Cart, on_delete = models.CASCADE)
-    quantity = models.PositiveIntegerField()    
+    quantity = models.PositiveIntegerField()
+
+class Address (models.Model):
+    COUNTRIES = (
+        ('Kuwait', 'Kuwait'),
+        ('Oman','Oman'),
+        ('UAE','UAE'),
+        ('KSA','KSA'),
+        ('Bahrain','Bahrain'),
+        ('Qatar','Qatar'),
+    )
+    user = models.OneToOneField(User , on_delete = models.CASCADE)
+    country = models.CharField( choices = COUNTRIES , max_length = 20, default='Kuwait')
+    city = models.CharField( max_length = 100, blank = True)
+    state = models.CharField( max_length = 100, blank = True)
+    zipcode = models.CharField(max_length = 5, blank = True)
+    street_line1 = models.CharField( max_length = 100, blank = True)
+    street_line2 = models.CharField( max_length = 100, blank = True)
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    phone = models.PositiveIntegerField(blank=True, null = True)
+    profile_image = models.ImageField(blank=True, null = True)
+    # date_of_birth = models.DateField()
+
+    def __str__(self):
+        return self.user.username
+    # address = models.ForeignKey(Address ,null=True, on_delete = models.CASCADE)
+
+   
+
 
    
 
