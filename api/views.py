@@ -1,7 +1,9 @@
 from rest_framework.generics import CreateAPIView, ListAPIView ,RetrieveUpdateAPIView ,RetrieveAPIView , DestroyAPIView
-from .serializers import (UserCreateSerializer , ItemListSerializer , CreateModelThrough , CheckOutSerializer, UserDataSerializer , ProfileSerializer , AddressSerializer, AddressCreateSerializer)
-from .models import Item , Cart , Profile , Address
+from .serializers import (UserCreateSerializer , ItemListSerializer ,UserCartHistory, CreateModelThrough , CheckOutSerializer, UserDataSerializer , ProfileSerializer , AddressSerializer, AddressCreateSerializer)
+from .models import Item , Cart , Profile , Address,ThroughCartItemModel
 from django.contrib.auth.models import User
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 class UserCreateAPIView(CreateAPIView):
     serializer_class = UserCreateSerializer
@@ -17,21 +19,47 @@ class CreateModelThroughAPIView(CreateAPIView):
 
 	def perform_create(self,serializer):
 			cart_obj,create = Cart.objects.get_or_create(status = False , user = self.request.user )
+			serializer.save(cart_id = cart_obj.id)
 
-			serializer.save(cart = cart_obj)
+# class UpdateModelThroughAPIView(CreateAPIView):
+# 	queryset = ThroughCartItemModel.objects.all()
+# 	serializer_class = UpdateModelThrough
+# 	lookup_field = 'id'
+# 	lookup_url_kwarg = 'cart_id'
+		
 
 
-class CheckoutAPIView(RetrieveUpdateAPIView):
-	queryset = Cart.objects.all()
-	serializer_class = CheckOutSerializer
+class CheckoutAPIView(APIView):
+	def get(self, request):
+		cart = Cart.objects.get(status=False, user=request.user)
+		cart.status = True
+		cart.save()
+		return Response({"chechedOut":5})
+
+class CartHistoryAPIView(ListAPIView):
+	queryset = Cart.objects.all().order_by('-timestamp')
+	serializer_class = UserCartHistory
 	lookup_field = 'id'
 	lookup_url_kwarg = 'cart_id'
 
-# class ItemDetailAPIView(ListAPIView):
-# 	 queryset = Item.objects.all()
-# 	 serializer_class = ItemdetailSerializer
-# 	 lookup_field = 'id'
-# 	 lookup_url_kwarg = 'item_id'
+class CartItemsHistoryAPIView(ListAPIView):
+	serializer_class = CreateModelThrough
+
+	def get_queryset(self):
+		return ThroughCartItemModel.objects.filter(cart_id=self.kwargs['cart_id'])
+
+
+
+
+	# def history(self, request, user_id):
+	#  	user = User.objects.get(id = user_id)
+	#  	cart = Cart.objects.filter(user = user)
+	#  	response = {
+	#  	'history':cart
+	#  	}
+	#  	return Response(response)
+
+	
 
 class EditProfileAPIView(RetrieveUpdateAPIView):
 	queryset = Profile.objects.all()
