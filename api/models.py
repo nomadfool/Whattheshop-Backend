@@ -26,17 +26,13 @@ class Cart(models.Model):
     # items = models.ManyToManyField(Item)
     user = models.ForeignKey(User , on_delete = models.CASCADE, null = True )
     status = models.BooleanField(default = False)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def total_price(self):
         total = 0
         for item in self.through.all():
             total += item.price
         return total
-
-
-
-
-
 
 
 class ThroughCartItemModel(models.Model):

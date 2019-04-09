@@ -34,15 +34,35 @@ class ItemListSerializer(serializers.ModelSerializer):
         model = Item
         fields =  '__all__'
 
+
+class UserCartHistory(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = '__all__'
+
+
 class CreateModelThrough(serializers.ModelSerializer):
-    cart = serializers.SerializerMethodField()
     class Meta:
         model = ThroughCartItemModel
-        fields = ['id', 'item','quantity','cart'] 
+        fields = ['id', 'item','item_id','quantity', 'cart'] 
         read_only_fields = ['cart']
+    
+    def create(self, validated_data):
+        print(validated_data)
+        quantity = validated_data["quantity"]
+        item = validated_data["item"]
+        cart = validated_data["cart_id"]
+        cart_item = ThroughCartItemModel.objects.filter(cart_id=cart, item=item)
+        if cart_item:
+            cart_item[0].quantity = cart_item[0].quantity + quantity
+            cart_item[0].save()
+        else:
+            cart_item = ThroughCartItemModel(cart_id=cart, item=item, quantity=quantity)
+            cart_item.save()
+        return validated_data
 
-    def get_cart(self, obj):
-        return obj.cart.id
+
+
 
 
 
@@ -52,13 +72,9 @@ class CheckOutSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ['status']       
-        
-# class ItemdetailSerializer(serializers.ModelSerializer):
-#     category = CategorySerializer(many = True)
-#     class Meta:
-#         model = Item
-#         fields =  '__all__'
+        fields = ['status'] 
+
+
 
 
 class ProfileSerializer(serializers.ModelSerializer):
